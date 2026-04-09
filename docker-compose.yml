@@ -1,0 +1,28 @@
+services:
+  caddy:
+    build:
+      context: https://github.com/cripty2001/docker-dynamic-caddy.git#main:src/caddy
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - caddy_data:/data
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - default
+      - ingress
+    environment:
+      - DOMAIN_MAPPINGS=${DOMAIN_MAPPINGS}
+      - CERTBOT_EMAIL=${CERTBOT_EMAIL}
+      - TZ=${TZ}
+
+volumes:
+  caddy_data:
+
+networks:
+  ingress:
+    external: true
