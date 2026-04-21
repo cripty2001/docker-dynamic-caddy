@@ -16,14 +16,10 @@ ${SCHEME}${PUBLIC_HOSTNAME} {
 		header_up Connection {>Connection}
 		header_up Upgrade {>Upgrade}
 
-		# Retry on errors (matching nginx proxy_next_upstream)
-		fail_duration 1s
+		fail_duration 10s
 		max_fails 3
 		unhealthy_status 502 503 504
 		unhealthy_latency 10s
-		health_uri ${HEALTH_URI}
-		health_interval 2s
-		health_timeout 3s
 	}
 
 	# Error handling (matching nginx @maintenance location)

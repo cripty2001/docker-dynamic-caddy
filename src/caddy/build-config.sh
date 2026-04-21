@@ -15,8 +15,7 @@ fi
 TLS_FLAG_RAW=$(echo "$line" | awk '{print $1}')
 PUBLIC_HOSTNAME=$(echo "$line" | awk '{print $2}')
 INTERNAL_HOSTNAME=$(echo "$line" | awk '{print $3}')
-FIELD4=$(echo "$line" | awk '{print $4}')
-FIELD5=$(echo "$line" | awk '{print $5}')
+HOST_HEADER=$(echo "$line" | awk '{print $4}')
 
 lowered=$(printf '%s' "$TLS_FLAG_RAW" | tr '[:upper:]' '[:lower:]')
 case "$lowered" in
@@ -33,16 +32,7 @@ if [[ -z "$PUBLIC_HOSTNAME" || -z "$INTERNAL_HOSTNAME" ]]; then
     exit 1
 fi
 
-# Field 4 is the optional health-check path if it starts with '/'. Retrocompatibility patch
-if [[ "$FIELD4" == /* ]]; then
-    HEALTH_URI="$FIELD4"
-    HOST_HEADER="$FIELD5"
-else
-    HEALTH_URI="/"
-    HOST_HEADER="$FIELD4"
-fi
-
-echo "Building config for $PUBLIC_HOSTNAME (internal: $INTERNAL_HOSTNAME, $TLS_MODE, health: $HEALTH_URI, forced host: ${HOST_HEADER:-<transparent>})" >&2
+echo "Building config for $PUBLIC_HOSTNAME (internal: $INTERNAL_HOSTNAME, $TLS_MODE, forced host: ${HOST_HEADER:-<transparent>})" >&2
 
 if [[ -n "$HOST_HEADER" ]]; then
     HOST_HEADER_VALUE="$HOST_HEADER"
@@ -59,6 +49,5 @@ sed -e "s/\${PUBLIC_HOSTNAME}/$PUBLIC_HOSTNAME/g" \
     -e "s/\${INTERNAL_HOSTNAME}/$INTERNAL_HOSTNAME/g" \
     -e "s/\${HOST_HEADER}/$HOST_HEADER_VALUE/g" \
     -e "s|\${SCHEME}|$SCHEME|g" \
-    -e "s|\${HEALTH_URI}|$HEALTH_URI|g" \
     "$TEMPLATE_FILE"
 echo ""
