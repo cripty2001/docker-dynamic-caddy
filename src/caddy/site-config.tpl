@@ -21,7 +21,7 @@ ${SCHEME}${PUBLIC_HOSTNAME} {
 		max_fails 3
 		unhealthy_status 502 503 504
 		unhealthy_latency 10s
-		health_uri /
+		health_uri ${HEALTH_URI}
 		health_interval 2s
 		health_timeout 3s
 	}

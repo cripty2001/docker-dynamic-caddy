@@ -5,6 +5,7 @@ A dynamic reverse proxy using Caddy
 ## Setup
 
 1. Create the external network:
+
    ```bash
    docker network create ingress
    ```
@@ -19,15 +20,19 @@ A dynamic reverse proxy using Caddy
    ```
 
 # Mapping Format
-Format per line: `encrypted|cleartext public-hostname internal-hostname [forced-host-header]`
-   - First column:
-     -  **`encrypted`**: HTTPS on Caddy with a certificate from Let’s Encrypt (ACME).
-     -  **`cleartext`**: HTTP only (e.g. TLS may have already been terminated before Caddy).
-   - `public-hostname`: The public domain name
-   - `internal-hostname`: The internal service hostname (Docker service name or external hostname)
-   - `forced-host-header` (optional): If provided, this value is used as the Host header sent to the upstream. If blank or omitted, the original public hostname is used (transparent proxy mode).
+
+Format per line: `encrypted|cleartext public-hostname internal-hostname [/health-path] [forced-host-header]`
+
+- First column:
+  - **`encrypted`**: HTTPS on Caddy with a certificate from Let’s Encrypt (ACME).
+  - **`cleartext`**: HTTP only (e.g. TLS may have already been terminated before Caddy).
+- `public-hostname`: The public domain name
+- `internal-hostname`: The internal service hostname (Docker service name or external hostname)
+- `/health-path` (optional): Path used for active health checks. Must start with `/` (e.g. `/health`, `/ping`). Defaults to `/` when omitted. Use this when the upstream returns a non-2xx on `/`.
+- `forced-host-header` (optional): If provided, this value is used as the Host header sent to the upstream. If blank or omitted, the original public hostname is used (transparent proxy mode).
 
 ## Features
+
 - **Per-site TLS**: First column is **`encrypted`** (automatic HTTPS) or **`cleartext`** (HTTP only)
 - **Dynamic Configuration**: Builds the Caddyfile from the `DOMAIN_MAPPINGS` environment variable
 - **WebSocket Support**: Full WebSocket proxy support
